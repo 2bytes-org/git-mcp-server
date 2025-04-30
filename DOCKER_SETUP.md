@@ -53,7 +53,7 @@ cd git-mcp-server
         "run",
         "--rm",
         "-i",
-        "--mount", "type=bind,src=${workspaceFolder},dst=/workspace",
+        "--mount", "type=bind,src=C:/Users/username/Documents,dst=/workspace",
         "mcp/git"
       ]
     }
@@ -61,13 +61,18 @@ cd git-mcp-server
 }
 ```
 
+**ВАЖНО!** Замените `C:/Users/username/Documents` на абсолютный путь к вашей директории с проектами:
+- Используйте прямые слеши `/` даже в Windows
+- Путь должен быть абсолютным (не используйте переменные вроде `${workspaceFolder}`)
+- Убедитесь, что указанная директория существует
+
 ### 3. Проверка настройки
 
 Перезапустите Claude Desktop и убедитесь, что вы можете использовать Git-команды через MCP.
 
 ## Доступ к различным директориям
 
-Если вы хотите предоставить доступ к нескольким директориям, вы можете изменить конфигурацию следующим образом:
+Если вам нужен доступ к нескольким директориям, вы можете изменить конфигурацию следующим образом:
 
 ```json
 {
@@ -78,8 +83,8 @@ cd git-mcp-server
         "run",
         "--rm",
         "-i",
-        "--mount", "type=bind,src=/path/to/dir1,dst=/projects/dir1",
-        "--mount", "type=bind,src=/path/to/dir2,dst=/projects/dir2",
+        "--mount", "type=bind,src=C:/path/to/dir1,dst=/projects/dir1",
+        "--mount", "type=bind,src=C:/path/to/dir2,dst=/projects/dir2",
         "mcp/git"
       ]
     }
@@ -88,6 +93,19 @@ cd git-mcp-server
 ```
 
 ## Устранение проблем
+
+### Проблемы с путями
+
+Наиболее распространенная ошибка - это неправильно указанные пути в конфигурации:
+
+```
+Error response from daemon: invalid mount config for type "bind": invalid mount path: '${workspaceFolder}' mount path must be absolute
+```
+
+Решение:
+- Убедитесь, что вы используете абсолютные пути (например, `C:/Users/username/Documents`)
+- Используйте прямые слеши `/` вместо обратных `\`, даже в Windows
+- Не используйте переменные типа `${workspaceFolder}` - они не поддерживаются в Claude Desktop
 
 ### Проблемы с правами доступа
 
@@ -115,5 +133,5 @@ docker logs $(docker ps -q --filter "ancestor=mcp/git")
 Или добавьте монтирование директории логов:
 
 ```json
-"--mount", "type=bind,src=/path/to/logs,dst=/home/mcpuser/.logs"
+"--mount", "type=bind,src=C:/path/to/logs,dst=/home/mcpuser/.logs"
 ```
