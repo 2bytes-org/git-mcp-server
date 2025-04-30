@@ -1,0 +1,16 @@
+{
+  "context_servers": {
+    "mcp-git-server": {
+      "command": {
+        "path": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "--mount", "type=bind,src=${workspaceFolder},dst=/workspace",
+          "mcp/git"
+        ]
+      }
+    }
+  }
+}
