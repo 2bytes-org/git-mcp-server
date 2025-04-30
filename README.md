@@ -46,13 +46,18 @@ Add the following to your Claude Desktop configuration file:
         "run",
         "--rm",
         "-i",
-        "--mount", "type=bind,src=${workspaceFolder},dst=/workspace",
+        "--mount", "type=bind,src=C:/path/to/your/projects,dst=/workspace",
         "mcp/git"
       ]
     }
   }
 }
 ```
+
+⚠️ **IMPORTANT:** Replace `C:/path/to/your/projects` with the absolute path to your projects directory:
+- Use forward slashes `/` even on Windows
+- The path must be absolute (e.g., `C:/Users/username/Documents`)
+- Make sure the specified directory exists
 
 Configuration file locations:
 - Windows: `%APPDATA%\Claude\config.json`
@@ -76,14 +81,15 @@ Configuration file locations:
 
 ## Troubleshooting
 
-If you encounter issues with the Docker build, check the following:
+If you encounter issues with the Docker setup:
 
-1. Ensure Docker is installed and running
-2. Verify that you have proper permissions to build Docker images
-3. Try running the Docker build manually:
-   ```bash
-   docker build -t mcp/git .
-   ```
+1. **Invalid mount path error**: Make sure you're using absolute paths with forward slashes in your configuration
+   - Example: `C:/Users/username/Documents` (not `${workspaceFolder}` or Windows backslashes)
+
+2. **Other issues**:
+   - Ensure Docker is installed and running
+   - Verify that you have proper permissions to build Docker images
+   - Try running the Docker build manually: `docker build -t mcp/git .`
 
 For more detailed troubleshooting, check the logs:
 ```bash
