@@ -12,31 +12,9 @@ A Model Context Protocol server for Git repository interaction and automation. T
 
 ## Installation
 
-### Standard Installation
+### Docker Installation (Recommended)
 
-#### Using pip
-
-```bash
-pip install mcp-git-server
-```
-
-#### Using uv
-
-```bash
-uv install mcp-git-server
-```
-
-Or run directly:
-
-```bash
-uvx mcp-git-server
-```
-
-### Docker Installation (Recommended for Claude Desktop)
-
-See [DOCKER_SETUP.md](DOCKER_SETUP.md) for detailed Docker setup instructions.
-
-Quick setup:
+Using Docker is the most reliable way to run MCP Git Server, as it ensures a consistent environment with all dependencies.
 
 ```bash
 # Clone the repository
@@ -44,33 +22,20 @@ git clone https://github.com/2bytes-org/git-mcp-server.git
 cd git-mcp-server
 
 # Build Docker image
-./scripts/build-docker.sh  # or .\scripts\build-docker.ps1 on Windows
+# Linux/macOS
+./scripts/build-docker.sh
 
-# Configure Claude Desktop
-# Add Docker configuration to Claude Desktop config.json
+# or Windows
+.\scripts\build-docker.ps1
 ```
 
-## Configuration
+For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
 
-### Usage with Claude Desktop
+## Configuration with Claude Desktop (Recommended Method)
 
-#### Standard Installation
+### Using Docker with Claude Desktop
 
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "git": {
-      "command": "mcp-git-server"
-    }
-  }
-}
-```
-
-#### Docker Installation (Recommended)
-
-Add to your `claude_desktop_config.json`:
+Add the following to your Claude Desktop configuration file:
 
 ```json
 {
@@ -89,35 +54,10 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### Usage with VS Code
-
-Add to your User Settings (JSON) or `.vscode/mcp.json`:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "git": {
-        "command": "mcp-git-server"
-      }
-    }
-  }
-}
-```
-
-### Usage with Zed
-
-Add to your Zed `settings.json`:
-
-```json
-"context_servers": {
-  "mcp-git-server": {
-    "command": {
-      "path": "mcp-git-server"
-    }
-  }
-},
-```
+Configuration file locations:
+- Windows: `%APPDATA%\Claude\config.json`
+- macOS: `~/Library/Application Support/Claude/config.json` 
+- Linux: `~/.config/Claude/config.json`
 
 ## Available Commands
 
@@ -134,21 +74,25 @@ Add to your Zed `settings.json`:
 - `git_show`: Shows the contents of a commit
 - `git_init`: Initializes a Git repository
 
-## Development
+## Troubleshooting
 
-Clone the repository and install in development mode:
+If you encounter issues with the Docker build, check the following:
 
+1. Ensure Docker is installed and running
+2. Verify that you have proper permissions to build Docker images
+3. Try running the Docker build manually:
+   ```bash
+   docker build -t mcp/git .
+   ```
+
+For more detailed troubleshooting, check the logs:
 ```bash
-git clone https://github.com/2bytes-org/git-mcp-server.git
-cd git-mcp-server
-pip install -e ".[dev]"
+docker logs $(docker ps -q --filter "ancestor=mcp/git")
 ```
 
-Run tests:
+## VS Code and Zed Integration
 
-```bash
-python run_tests.py
-```
+The server also works with other editors that support MCP. See the `examples` directory for configuration templates.
 
 ## License
 
