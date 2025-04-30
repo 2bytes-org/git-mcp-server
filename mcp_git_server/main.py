@@ -4,19 +4,19 @@ import logging
 import sys
 import json
 from typing import Dict, Any, List, Optional
-from model_context_protocol import Server, FunctionRegistry, FunctionDefinition
 
 from mcp_git_server.git_operations import GitOperations
+from mcp_git_server.mcp import Server, FunctionRegistry, FunctionDefinition
+from mcp_git_server.error_handling import setup_exception_handling
+from mcp_git_server.logging_config import setup_logging
+from mcp_git_server.utils import get_system_info
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+# Setup logging
+setup_logging()
 logger = logging.getLogger(__name__)
+
+# Setup exception handling
+setup_exception_handling()
 
 def register_functions(server: Server) -> None:
     """Register Git operations as MCP functions."""
@@ -283,11 +283,26 @@ def register_functions(server: Server) -> None:
         )
     )
     
+    # system_info
+    registry.register(
+        FunctionDefinition(
+            name="system_info",
+            description="Returns system information for debugging",
+            parameters={
+                "type": "object",
+                "properties": {},
+                "required": []
+            },
+            function=lambda params: get_system_info()
+        )
+    )
+    
     server.function_registry = registry
 
 def main() -> None:
     """Main entry point for the MCP Git Server."""
     logger.info("Starting MCP Git Server...")
+    logger.info(f"System info: {json.dumps(get_system_info(), indent=2)}")
     
     server = Server()
     register_functions(server)
