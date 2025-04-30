@@ -7,7 +7,7 @@ setup(
     install_requires=[
         "gitpython>=3.1.0",
         "pydantic>=2.0.0",
-        "model-context-protocol>=0.3.0"
+        "jsonschema>=4.0.0"
     ],
     entry_points={
         "console_scripts": [
