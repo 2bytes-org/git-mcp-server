@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "git": {
+      "command": "python",
+      "args": ["-m", "mcp_git_server.main"]
+    }
+  }
+}
