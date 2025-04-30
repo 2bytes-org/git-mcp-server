@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS builder
+FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -6,29 +6,16 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     git \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy project files
 COPY . /app/
 
-# Install the package
+# Install required dependencies directly
+RUN pip install --no-cache-dir gitpython>=3.1.0 pydantic>=2.0.0 jsonschema>=4.0.0
+
+# Install the package in development mode
 RUN pip install --no-cache-dir -e .
-
-FROM python:3.10-slim
-
-WORKDIR /app
-
-# Install git
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy installed package from builder
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /app /app
 
 # Create a non-root user to run the service
 RUN useradd -m -u 1000 mcpuser && \
