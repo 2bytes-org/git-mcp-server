@@ -4,7 +4,7 @@ import sys
 import json
 import logging
 from jsonschema import validate
-from typing import Dict, Any, List, Callable, Optional
+from typing import Dict, Any, List, Callable, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -59,21 +59,46 @@ class Server:
     def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Handle an MCP request."""
         try:
+            request_id = request.get("id")
             method = request.get("method")
-            if method == "mcp.get_schema":
-                return self._handle_get_schema()
-            elif method == "mcp.execute_function":
-                return self._handle_execute_function(request)
-            else:
-                return {
-                    "error": {
-                        "code": -32601,
-                        "message": f"Method not found: {method}"
-                    }
+            
+            # Always include jsonrpc version and id in response
+            response = {
+                "jsonrpc": "2.0",
+                "id": request_id
+            }
+            
+            if method == "initialize":
+                # Handle initialize request specially
+                response["result"] = {
+                    "capabilities": {}
                 }
+                return response
+            elif method == "mcp.get_schema":
+                result = self._handle_get_schema()
+                if "error" in result:
+                    response["error"] = result["error"]
+                else:
+                    response["result"] = result["result"]
+                return response
+            elif method == "mcp.execute_function":
+                result = self._handle_execute_function(request)
+                if "error" in result:
+                    response["error"] = result["error"]
+                else:
+                    response["result"] = result["result"]
+                return response
+            else:
+                response["error"] = {
+                    "code": -32601,
+                    "message": f"Method not found: {method}"
+                }
+                return response
         except Exception as e:
             logger.error(f"Error handling request: {str(e)}")
             return {
+                "jsonrpc": "2.0",
+                "id": request.get("id"),
                 "error": {
                     "code": -32603,
                     "message": f"Internal error: {str(e)}"
@@ -161,6 +186,8 @@ class Server:
             except json.JSONDecodeError as e:
                 logger.error(f"Invalid JSON input: {str(e)}")
                 sys.stdout.write(json.dumps({
+                    "jsonrpc": "2.0",
+                    "id": None,
                     "error": {
                         "code": -32700,
                         "message": f"Parse error: {str(e)}"
@@ -171,6 +198,8 @@ class Server:
             except Exception as e:
                 logger.error(f"Unexpected error in server loop: {str(e)}")
                 sys.stdout.write(json.dumps({
+                    "jsonrpc": "2.0",
+                    "id": None,
                     "error": {
                         "code": -32603,
                         "message": f"Internal error: {str(e)}"
